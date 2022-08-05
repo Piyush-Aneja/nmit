@@ -1,0 +1,74 @@
+import numpy as np
+pt = ct = dt = ""
+
+
+def getReshapedKey():
+    if(size == 2):
+        return key.reshape(2, 2)
+    elif(size == 3):
+        return key.reshape(3, 3)
+
+
+def encryption(pt):
+    while(len(pt) % size != 0):
+        pt += "x"
+    pt = np.array([(ord(a)-97) for a in pt])
+
+    ptm = np.array_split(pt, len(pt)/size)
+
+    ct = ""
+    for a in ptm:
+        a = a.reshape(size, 1)
+        encr = np.dot(keym, a) % 26
+        for a in np.nditer(encr):
+            ct += chr(a+97)
+
+    return ct
+
+
+def decryption(ct):
+    adj = np.linalg.inv(keym)
+    det = round(np.linalg.det(keym))
+    adj = adj*det
+
+    np.where(adj < 0, adj+26, adj)
+
+    x = 1
+    while((det*x) % 26 != 1):
+        x += 1
+
+    inv = (x*adj) % 26
+    ct = np.array([(ord(a)-97) for a in ct])
+    ctm = np.array_split(ct, len(ct)/size)
+    pt = ""
+    for a in ctm:
+        a = a.reshape(size, 1)
+        decr = np.round(np.dot(inv, a)).astype(int) % 26
+
+        for a in np.nditer(decr):
+            pt += chr(a+97)
+
+    return pt
+
+
+pt = input("Enter the plain text ")
+pt = pt.lower().replace(" ", "")
+
+size = int(input("Enter the size of the key "))
+if(size != 2 and size != 3):
+    print("Size must be either 2 or 3")
+    exit(0)
+print("Enter the key row wise\n")
+key = []
+for i in range(size*size):
+    key.append(int(input(f"Enter Element {i} ")))
+key = np.array(key)
+keym = getReshapedKey()
+print("\n\n The key received is ")
+print(keym)
+
+ct = encryption(pt)
+print("\nEncrypted text is: ", ct)
+
+dt = decryption(ct)
+print("\nDecrypted text is: ", dt)

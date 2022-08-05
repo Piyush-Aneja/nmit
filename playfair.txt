@@ -1,0 +1,156 @@
+#include <bits/stdc++.h>
+#include <unordered_set>
+#include <iostream>
+using namespace std;
+int main()
+{
+    char mat[5][5];
+    string key, msg, finalans = "";
+    cout << "Enter key:";
+    getline(cin, key);
+    cout << "Enter message:";
+    getline(cin, msg);
+    // cin>>msg;
+    msg.erase(std::remove_if(msg.begin(), msg.end(), ::isspace), msg.end());
+    key.erase(std::remove_if(key.begin(), key.end(), ::isspace), key.end());
+    cout << "key:" << key << endl;
+    cout << "msg:" << msg << endl;
+    map<char, int> mp;
+
+    int i = 0, j = 0, f = 0, h = 0;
+    while (i < 5)
+    {
+        while (j < 5)
+        {
+            if (f < key.length())
+            {
+                char ch = key[f];
+                if (!mp[ch])
+                {
+                    cout << ch << endl;
+                    mat[i][j] = ch;
+                    mp[ch] = 1;
+
+                    j++;
+                    f++;
+                }
+                else
+                {
+                    f++;
+                }
+            }
+            else
+            {
+                h = 1;
+                break;
+            }
+        }
+        if (h)
+            break;
+        j = 0;
+        i++;
+    }
+
+    char ch = 'a';
+    while (i < 5)
+    {
+        while (j < 5)
+        {
+            // if (ch == 'j')
+            // ch = ch + 1;
+            if (!mp[ch])
+            {
+
+                mat[i][j] = ch;
+                mp[ch] = 1;
+                j++;
+                ch = ch + 1;
+            }
+            else
+            {
+                ch = ch + 1;
+            }
+        }
+        j = 0;
+        i++;
+    }
+
+    map<char, pair<int, int>> mpp;
+    for (int k = 0; k < 5; k++)
+    {
+        for (int l = 0; l < 5; l++)
+        {
+            cout << mat[k][l] << " ";
+            mpp[mat[k][l]] = {k, l};
+        }
+        cout << endl;
+    }
+
+    vector<pair<char, char>> duplets;
+    int k = 0;
+    while (k < msg.length() - 1)
+    {
+        char ch = msg[k];
+        char ch1 = msg[k + 1];
+        if (ch != ch1)
+        {
+            duplets.push_back({ch, ch1});
+            k = k + 2;
+        }
+        else
+        {
+            duplets.push_back({ch, 'x'});
+            k++;
+        }
+    }
+    if (k == msg.length() - 1)
+    {
+        duplets.push_back({ch, 'x'});
+    }
+    string ans = "";
+    for (auto it : duplets)
+    {
+        cout << it.first << it.second << " ";
+    }
+    cout << endl;
+
+    for (auto it : duplets)
+    {
+
+        auto f = mpp[it.first];
+        auto s = mpp[it.second];
+
+        if (f.first == s.first) // same row
+        {
+            char ch1 = mat[f.first][(f.second + 1) % 5];
+            char ch2 = mat[s.first][(s.second + 1) % 5];
+            cout << (f.second + 1) % 5 << endl;
+            finalans += ch1;
+            finalans += ch2;
+        }
+        else if (f.second == s.second) // same col
+        {
+            char ch1 = mat[(f.first + 1) % 5][f.second];
+            char ch2 = mat[(s.first + 1) % 5][s.second];
+            finalans += ch1;
+            finalans += ch2;
+        }
+        else
+        {
+            char ch1 = mat[f.first][s.second];
+            char ch2 = mat[s.first][f.second];
+            finalans += ch1;
+            finalans += ch2;
+        }
+    }
+
+    k = 0;
+
+    while (k < finalans.length() - 1)
+    {
+        cout << finalans[k] << finalans[k + 1] << " ";
+        k = k + 2;
+    }
+    cout << endl;
+    return 0;
+}
